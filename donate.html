@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Donate – YONA Foundation</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="logo-y">Y</span><span class="logo-o">O</span><span class="logo-n">N</span><span class="logo-a">A</span>
+      <span class="logo-sub">Foundation</span>
+    </a>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="programs.html">Programs</a></li>
+      <li><a href="gethelp.html">Get Help</a></li>
+      <li><a href="events.html">Events</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="donate.html" class="nav-donate active">Donate</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <span class="eyebrow">Make a Difference</span>
+  <h1>Donate to YONA Foundation</h1>
+  <p>Your generosity feeds families, empowers youth, and changes lives. Every dollar counts.</p>
+</section>
+
+<section class="donate-section">
+  <div class="container">
+    <div class="donate-grid">
+      <div>
+        <h3 style="font-family:var(--font-display);font-size:1.5rem;margin-bottom:20px;font-weight:900;">Choose an Amount</h3>
+        <div class="donate-amounts" id="amountGrid">
+          <button class="amount-btn" onclick="selectAmount(this,'10')">
+            <span class="amount">$10</span><small>Feeds 1 person</small>
+          </button>
+          <button class="amount-btn active" onclick="selectAmount(this,'25')">
+            <span class="amount">$25</span><small>Feeds a family for a day</small>
+          </button>
+          <button class="amount-btn" onclick="selectAmount(this,'50')">
+            <span class="amount">$50</span><small>Emergency aid kit</small>
+          </button>
+          <button class="amount-btn" onclick="selectAmount(this,'100')">
+            <span class="amount">$100</span><small>Month of food support</small>
+          </button>
+        </div>
+        <div class="donate-form-group">
+          <label>Or enter a custom amount ($)</label>
+          <input type="number" id="customAmount" placeholder="Enter amount" min="1"/>
+        </div>
+        <div class="donate-form-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="Your full name"/>
+        </div>
+        <div class="donate-form-group">
+          <label>Email Address</label>
+          <input type="email" placeholder="your@email.com"/>
+        </div>
+        <div class="donate-form-group">
+          <label>Card Number</label>
+          <input type="text" placeholder="**** **** **** ****" maxlength="19"/>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="donate-form-group">
+            <label>Expiry Date</label>
+            <input type="text" placeholder="MM / YY" maxlength="7"/>
+          </div>
+          <div class="donate-form-group">
+            <label>CVV</label>
+            <input type="text" placeholder="***" maxlength="4"/>
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%;border:none;cursor:pointer;font-size:1.1rem;padding:16px;" onclick="handleDonate()">
+          💛 Donate Now
+        </button>
+        <p style="font-size:0.8rem;color:var(--gray-600);margin-top:12px;text-align:center;">🔒 Secure & encrypted. Tax-deductible donation.</p>
+      </div>
+
+      <div class="donate-info">
+        <h3>Your Donation at Work</h3>
+        <p>100% of your donation goes directly to programs that feed and support people in need. We are transparent about how every dollar is spent.</p>
+        <div class="impact-list">
+          <div class="impact-item">
+            <div class="impact-icon">🍱</div>
+            <div><h5>$10 provides</h5><p>A full nutritious meal pack for one person for a week.</p></div>
+          </div>
+          <div class="impact-item">
+            <div class="impact-icon">👨‍👩‍👧</div>
+            <div><h5>$25 provides</h5><p>A family of 4 with food support for an entire day.</p></div>
+          </div>
+          <div class="impact-item">
+            <div class="impact-icon">🧴</div>
+            <div><h5>$50 provides</h5><p>A full emergency aid kit with hygiene items and essentials.</p></div>
+          </div>
+          <div class="impact-item">
+            <div class="impact-icon">📚</div>
+            <div><h5>$100 provides</h5><p>One month of food support AND youth program materials.</p></div>
+          </div>
+        </div>
+        <div style="background:linear-gradient(135deg,#e8f0fe,#fff7ed);border-radius:14px;padding:24px;margin-top:28px;">
+          <p style="font-family:var(--font-display);font-style:italic;font-size:1rem;color:var(--gray-700);">"Thanks to generous donors like you, we served over 12,000 meals last year. You are the reason families don't go to bed hungry."</p>
+          <p style="font-size:0.85rem;color:var(--orange);font-weight:700;margin-top:8px;">— Sarah Mitchell, Executive Director</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">YONA<span>Foundation</span></div>
+      <p>You Are Not Alone.</p>
+    </div>
+    <div class="footer-links"><h5>Quick Links</h5><ul>
+      <li><a href="about.html">About Us</a></li><li><a href="programs.html">Programs</a></li>
+      <li><a href="gethelp.html">Get Help</a></li><li><a href="donate.html">Donate</a></li>
+    </ul></div>
+    <div class="footer-links"><h5>Support</h5><ul>
+      <li><a href="events.html">Events</a></li><li><a href="blog.html">Blog</a></li>
+      <li><a href="contact.html">Contact Us</a></li>
+    </ul></div>
+    <div class="footer-contact"><h5>Contact</h5>
+      <p>📧 info@yonafoundation.org</p><p>📞 +1 (800) YONA-HELP</p>
+    </div>
+  </div>
+  <div class="footer-bottom"><p>© 2026 YONA Foundation. All rights reserved.</p></div>
+</footer>
+<script src="main.js"></script>
+<script>
+function selectAmount(btn, val) {
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('customAmount').value = '';
+}
+function handleDonate() {
+  alert('Thank you for your generosity! In a live site, payment processing would be integrated here (e.g. Stripe). You Are Not Alone — and neither are those you just helped! 💛');
+}
+</script>
+</body>
+</html>
