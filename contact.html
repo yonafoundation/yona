@@ -11,8 +11,11 @@
 <nav id="navbar">
   <div class="nav-inner">
     <a href="index.html" class="nav-logo">
-      <span class="logo-y">Y</span><span class="logo-o">O</span><span class="logo-n">N</span><span class="logo-a">A</span>
-      <span class="logo-sub">Foundation</span>
+      <img src="logo-full.png" alt="YONA Foundation" class="nav-logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <span class="nav-logo-text" style="display:none">
+        <span class="logo-y">Y</span><span class="logo-o">O</span><span class="logo-n">N</span><span class="logo-a">A</span>
+        <span class="logo-sub">Foundation</span>
+      </span>
     </a>
     <button class="hamburger" id="hamburger">&#9776;</button>
     <ul class="nav-links" id="navLinks">
@@ -50,10 +53,6 @@
           <input type="email" placeholder="your@email.com"/>
         </div>
         <div class="contact-form-group">
-          <label>Phone Number</label>
-          <input type="tel" placeholder="+1 (000) 000-0000"/>
-        </div>
-        <div class="contact-form-group">
           <label>Reason for Contact</label>
           <select>
             <option value="">Select a reason...</option>
@@ -83,21 +82,21 @@
             <div class="contact-icon">📧</div>
             <div>
               <h4>Email</h4>
-              <p>info@yonafoundation.org<br>For general inquiries and support requests.</p>
+              <p>supportyona@gmail.com<br>For general inquiries and support requests.</p>
             </div>
           </div>
           <div class="contact-info-card">
             <div class="contact-icon">📞</div>
             <div>
               <h4>Phone / Helpline</h4>
-              <p>+1 (800) YONA-HELP<br>Mon–Sat, 8:00 AM – 6:00 PM</p>
+              
             </div>
           </div>
           <div class="contact-info-card">
             <div class="contact-icon">📍</div>
             <div>
               <h4>Office Address</h4>
-              <p>123 Hope Street, Suite 200<br>Community City, ST 00000</p>
+              <p>Magdhub Nagar<br>Guntur – 522001</p>
             </div>
           </div>
           <div class="contact-info-card">
@@ -116,7 +115,7 @@
 <footer>
   <div class="container footer-inner">
     <div class="footer-brand">
-      <div class="footer-logo">YONA<span>Foundation</span></div>
+      <img src="logo-full.png" alt="YONA Foundation" class="footer-logo-img" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\"footer-logo\">YONA<span>Foundation</span></div>')" />
       <p>You Are Not Alone.</p>
     </div>
     <div class="footer-links"><h5>Quick Links</h5><ul>
@@ -128,7 +127,8 @@
       <li><a href="contact.html">Contact Us</a></li>
     </ul></div>
     <div class="footer-contact"><h5>Contact</h5>
-      <p>📧 info@yonafoundation.org</p><p>📞 +1 (800) YONA-HELP</p>
+      <p>📧 <a href="mailto:supportyona@gmail.com" style="color:inherit">supportyona@gmail.com</a></p>
+      <p>📍 Magdhub Nagar, Guntur – 522001</p>
     </div>
   </div>
   <div class="footer-bottom"><p>© 2026 YONA Foundation. All rights reserved.</p></div>

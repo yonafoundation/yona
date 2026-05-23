@@ -11,8 +11,11 @@
 <nav id="navbar">
   <div class="nav-inner">
     <a href="index.html" class="nav-logo">
-      <span class="logo-y">Y</span><span class="logo-o">O</span><span class="logo-n">N</span><span class="logo-a">A</span>
-      <span class="logo-sub">Foundation</span>
+      <img src="logo-full.png" alt="YONA Foundation" class="nav-logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <span class="nav-logo-text" style="display:none">
+        <span class="logo-y">Y</span><span class="logo-o">O</span><span class="logo-n">N</span><span class="logo-a">A</span>
+        <span class="logo-sub">Foundation</span>
+      </span>
     </a>
     <button class="hamburger" id="hamburger">&#9776;</button>
     <ul class="nav-links" id="navLinks">
@@ -63,25 +66,30 @@
     </div>
     <div class="team-grid">
       <div class="team-card">
-        <div class="team-avatar">👩</div>
-        <h4>Sarah Mitchell</h4>
-        <span>Executive Director</span>
+        <div class="team-avatar">💙</div>
+        <h4>Founder & Director</h4>
+        <span>YONA Foundation</span>
       </div>
       <div class="team-card">
-        <div class="team-avatar">👨</div>
-        <h4>James Okonkwo</h4>
-        <span>Programs Manager</span>
+        <div class="team-avatar">🤝</div>
+        <h4>Field Operations</h4>
+        <span>Guntur Region</span>
       </div>
       <div class="team-card">
-        <div class="team-avatar">👩</div>
-        <h4>Priya Sharma</h4>
-        <span>Community Outreach</span>
+        <div class="team-avatar">📢</div>
+        <h4>Community Outreach</h4>
+        <span>Magdhub Nagar</span>
       </div>
       <div class="team-card">
-        <div class="team-avatar">👨</div>
-        <h4>Carlos Rivera</h4>
-        <span>Volunteer Coordinator</span>
+        <div class="team-avatar">🌟</div>
+        <h4>25+ Volunteers</h4>
+        <span>Growing Every Day</span>
       </div>
+    </div>
+    <div style="text-align:center;margin-top:40px;padding:32px;background:linear-gradient(135deg,#e8f0fe,#fff7ed);border-radius:20px;">
+      <h3 style="font-family:var(--font-display);font-size:1.4rem;font-weight:900;margin-bottom:12px;color:var(--blue);">We Just Started — Join Our Team!</h3>
+      <p style="color:var(--gray-600);max-width:500px;margin:0 auto 20px;line-height:1.7;">YONA Foundation launched in 2026. We are a passionate group of volunteers in Guntur, Andhra Pradesh. Want to be part of something meaningful from day one?</p>
+      <a href="mailto:supportyona@gmail.com" class="btn-primary" style="border:none;">💌 Join Our Volunteer Team</a>
     </div>
   </div>
 </section>
@@ -89,7 +97,7 @@
 <footer>
   <div class="container footer-inner">
     <div class="footer-brand">
-      <div class="footer-logo">YONA<span>Foundation</span></div>
+      <img src="logo-full.png" alt="YONA Foundation" class="footer-logo-img" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\"footer-logo\">YONA<span>Foundation</span></div>')" />
       <p>You Are Not Alone. We stand together as a community of compassion, support, and hope.</p>
     </div>
     <div class="footer-links"><h5>Quick Links</h5><ul>
@@ -101,7 +109,8 @@
       <li><a href="contact.html">Contact Us</a></li>
     </ul></div>
     <div class="footer-contact"><h5>Contact</h5>
-      <p>📧 info@yonafoundation.org</p><p>📞 +1 (800) YONA-HELP</p><p>📍 123 Hope Street, Community City</p>
+      <p>📧 <a href="mailto:supportyona@gmail.com" style="color:inherit">supportyona@gmail.com</a></p>
+      <p>📍 Magdhub Nagar, Guntur – 522001</p>
     </div>
   </div>
   <div class="footer-bottom"><p>© 2026 YONA Foundation. All rights reserved.</p></div>
