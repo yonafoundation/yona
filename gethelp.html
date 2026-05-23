@@ -11,8 +11,11 @@
 <nav id="navbar">
   <div class="nav-inner">
     <a href="index.html" class="nav-logo">
-      <span class="logo-y">Y</span><span class="logo-o">O</span><span class="logo-n">N</span><span class="logo-a">A</span>
-      <span class="logo-sub">Foundation</span>
+      <img src="logo-full.png" alt="YONA Foundation" class="nav-logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+      <span class="nav-logo-text" style="display:none">
+        <span class="logo-y">Y</span><span class="logo-o">O</span><span class="logo-n">N</span><span class="logo-a">A</span>
+        <span class="logo-sub">Foundation</span>
+      </span>
     </a>
     <button class="hamburger" id="hamburger">&#9776;</button>
     <ul class="nav-links" id="navLinks">
@@ -64,9 +67,10 @@
     </div>
 
     <div class="hotline-box" style="max-width:600px;margin:60px auto 0;">
-      <h3>Need Immediate Help?</h3>
-      <div class="phone">+1 (800) YONA-HELP</div>
-      <p>Our helpline is available Monday–Saturday, 8am–6pm. Leave a message any time and we'll get back to you within 24 hours.</p>
+      <h3>Need Help? Reach Out Directly</h3>
+      <div class="phone" style="font-size:1.4rem;word-break:break-all;">supportyona@gmail.com</div>
+      <p>Email us anytime and we will respond within 24–48 hours. We are based in Magdhub Nagar, Guntur — here for you.</p>
+      <a href="mailto:supportyona@gmail.com" class="btn-primary" style="display:inline-block;margin-top:16px;border:none;">✉️ Email Us Now</a>
     </div>
   </div>
 </section>
@@ -74,7 +78,7 @@
 <footer>
   <div class="container footer-inner">
     <div class="footer-brand">
-      <div class="footer-logo">YONA<span>Foundation</span></div>
+      <img src="logo-full.png" alt="YONA Foundation" class="footer-logo-img" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\"footer-logo\">YONA<span>Foundation</span></div>')" />
       <p>You Are Not Alone.</p>
     </div>
     <div class="footer-links"><h5>Quick Links</h5><ul>
@@ -86,7 +90,8 @@
       <li><a href="contact.html">Contact Us</a></li>
     </ul></div>
     <div class="footer-contact"><h5>Contact</h5>
-      <p>📧 info@yonafoundation.org</p><p>📞 +1 (800) YONA-HELP</p>
+      <p>📧 <a href="mailto:supportyona@gmail.com" style="color:inherit">supportyona@gmail.com</a></p>
+      <p>📍 Magdhub Nagar, Guntur – 522001</p>
     </div>
   </div>
   <div class="footer-bottom"><p>© 2026 YONA Foundation. All rights reserved.</p></div>
