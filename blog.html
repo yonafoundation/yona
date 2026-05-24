@@ -39,7 +39,12 @@
 
 <section class="section-pad">
   <div class="container">
-    <div class="blog-grid">
+    <div id="blogLoading" style="text-align:center;padding:60px 0;color:#475569;">
+      <div style="font-size:2rem;margin-bottom:12px;">⏳</div>
+      <p>Loading latest posts...</p>
+    </div>
+    <div id="blogAnnouncements" style="margin-bottom:32px;"></div>
+    <div class="blog-grid" id="blogGrid" style="display:none;">
       <div class="blog-card">
         <div class="blog-img bg1">🍱</div>
         <div class="blog-body">
@@ -137,6 +142,63 @@
   </div>
   <div class="footer-bottom"><p>© 2026 YONA Foundation. All rights reserved.</p></div>
 </footer>
+<script src="drive.js"></script>
 <script src="main.js"></script>
+<script>
+(async () => {
+  const content = await YONA_DRIVE.loadContent();
+  const grid = document.getElementById('blogGrid');
+  const loading = document.getElementById('blogLoading');
+  const annDiv = document.getElementById('blogAnnouncements');
+
+  // Announcements
+  const anns = (content.announcements||[]).filter(a=>a.visible);
+  if (anns.length) {
+    annDiv.innerHTML = anns.map(a=>`
+      <div style="background:linear-gradient(135deg,rgba(26,86,219,0.08),rgba(249,115,22,0.06));border:1px solid rgba(26,86,219,0.2);border-radius:14px;padding:16px 20px;margin-bottom:12px;">
+        <strong style="color:#1a56db;">${a.title}</strong>
+        <span style="font-size:0.78rem;color:#475569;margin-left:10px;">${a.date}</span>
+        <p style="margin-top:6px;color:#334155;font-size:0.9rem;">${a.body}</p>
+      </div>`).join('');
+  }
+
+  // Blog posts
+  const posts = (content.blog_posts||[]).filter(p=>p.visible).sort((a,b)=>b.id.localeCompare(a.id));
+  loading.style.display = 'none';
+
+  if (!posts.length) {
+    grid.style.display = 'grid';
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#475569;">
+        <div style="font-size:3rem;margin-bottom:16px;">✍️</div>
+        <h3 style="font-family:'Playfair Display',serif;margin-bottom:8px;">No Posts Yet</h3>
+        <p>We are just getting started. Check back soon for stories and updates from YONA Foundation!</p>
+      </div>`;
+    return;
+  }
+
+  const bgClasses = ['bg1','bg2','bg3','bg4'];
+  const emojis = ['🍱','👥','🤝','💛','🏠','🎉'];
+  grid.innerHTML = posts.map((p,i) => {
+    const thumb = p.images && p.images[0]
+      ? `<img src="https://drive.google.com/thumbnail?id=${p.images[0].driveFileId}&sz=w400" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentNode.innerHTML='${emojis[i%emojis.length]}'"/>`
+      : emojis[i % emojis.length];
+    return `<div class="blog-card">
+      <div class="blog-img ${bgClasses[i%bgClasses.length]}" style="${p.images&&p.images[0]?'padding:0;overflow:hidden;':''}">${thumb}</div>
+      <div class="blog-body">
+        <span class="blog-tag">${p.tag||'News'}</span>
+        ${p.featured?'<span class="blog-tag" style="background:#fff7ed;color:#f97316;margin-left:6px;">⭐ Featured</span>':''}
+        <h3>${p.title}</h3>
+        <p>${p.summary||''}</p>
+        <div class="blog-footer">
+          <span class="blog-date">${p.date||''}</span>
+          <span class="read-more" style="cursor:default;color:#94a3b8;">YONA Foundation</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  grid.style.display = 'grid';
+})();
+</script>
 </body>
 </html>

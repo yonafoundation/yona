@@ -214,6 +214,61 @@
   </div>
 </footer>
 
+<script src="drive.js"></script>
 <script src="main.js"></script>
+<script>
+(async () => {
+  const content = await YONA_DRIVE.loadContent();
+
+  // Hero
+  const h = content.hero || {};
+  const eyebrow = document.querySelector('.hero-eyebrow');
+  if (eyebrow && h.eyebrow) eyebrow.textContent = h.eyebrow;
+  const titleEl = document.querySelector('.hero-title');
+  if (titleEl && h.title && h.titleEm) {
+    titleEl.innerHTML = h.title.replace(h.titleEm, `<em>${h.titleEm}</em>`).replace(' ', '<br>');
+  }
+  const descEl = document.querySelector('.hero-desc');
+  if (descEl && h.description) descEl.textContent = h.description;
+
+  // Stats
+  const stats = content.stats || [];
+  const statEls = document.querySelectorAll('.stat');
+  stats.forEach((s, i) => {
+    if (statEls[i]) {
+      statEls[i].querySelector('.stat-num').textContent = s.num;
+      statEls[i].querySelector('.stat-label').textContent = s.label;
+    }
+  });
+
+  // Mission quote
+  const mq = document.querySelector('.mission-strip p');
+  if (mq && content.mission_quote) mq.textContent = content.mission_quote;
+
+  // Testimonials
+  const tGrid = document.querySelector('.testimonials-grid');
+  const visibleQ = (content.quotes||[]).filter(q=>q.visible).slice(0,3);
+  if (tGrid && visibleQ.length) {
+    tGrid.innerHTML = visibleQ.map(q=>`
+      <div class="testimonial-card">
+        <p>"${q.text}"</p>
+        <div class="testi-author">— ${q.author}</div>
+      </div>`).join('');
+  }
+
+  // Events teaser
+  const evList = document.querySelector('.events-list');
+  const visEv = (content.events||[]).filter(e=>e.visible).slice(0,3);
+  const icons = {'Planning Phase':'🍱','Open Invitation':'🤝','Coming Soon':'💛','Ongoing':'🌿','Networking':'🤝','Festival Season':'🎉'};
+  if (evList && visEv.length) {
+    evList.innerHTML = visEv.map(e=>`
+      <div class="event-item">
+        <div class="event-date"><span class="eday">${icons[e.badge]||'📅'}</span><span class="emon">${e.badge.split(' ')[0]}</span></div>
+        <div class="event-info"><h4>${e.title}</h4><p>${e.description||''}</p></div>
+        <a href="${e.link||'events.html'}" class="btn-ghost-sm">Details</a>
+      </div>`).join('');
+  }
+})();
+</script>
 </body>
 </html>

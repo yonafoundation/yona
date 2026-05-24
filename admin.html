@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YONA Admin — Content Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <script src="drive.js"></script>
+  <style>
+    :root {
+      --blue: #1a56db; --blue-dark: #0f3a9e; --orange: #f97316;
+      --bg: #0c0f1a; --surface: #151929; --surface2: #1e2438;
+      --border: rgba(255,255,255,0.08); --text: #e8eaf0; --muted: #7b82a0;
+      --green: #22c55e; --red: #ef4444; --yellow: #eab308;
+      --font-head: 'Syne', sans-serif; --font-body: 'Outfit', sans-serif;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── LOGIN ── */
+    #loginScreen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at 30% 50%, rgba(26,86,219,0.15), transparent 60%),
+                  radial-gradient(ellipse at 70% 50%, rgba(249,115,22,0.1), transparent 60%), var(--bg);
+    }
+    .login-box {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+      padding: 48px; width: 100%; max-width: 400px; text-align: center;
+    }
+    .login-logo { font-family: var(--font-head); font-size: 2rem; font-weight: 800; margin-bottom: 4px; }
+    .login-logo span { color: var(--orange); }
+    .login-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 32px; }
+    .login-box h2 { font-family: var(--font-head); font-size: 1.3rem; margin-bottom: 24px; }
+    .field { text-align: left; margin-bottom: 16px; }
+    .field label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .field input, .field select, .field textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 11px 14px; font-family: var(--font-body);
+      font-size: 0.95rem; transition: border-color .2s; resize: vertical;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--blue); }
+    .field textarea { min-height: 100px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: 8px; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+    .btn-primary { background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: white; }
+    .btn-primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .btn-orange { background: linear-gradient(135deg, var(--orange), #ea580c); color: white; }
+    .btn-orange:hover { filter: brightness(1.1); }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+    .btn-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+    .btn-danger:hover { background: rgba(239,68,68,0.25); }
+    .btn-success { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+    .btn-sm { padding: 7px 14px; font-size: 0.82rem; }
+    .btn-full { width: 100%; justify-content: center; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    /* ── LAYOUT ── */
+    #app { display: none; min-height: 100vh; }
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 240px;
+      background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-logo { padding: 24px 20px 16px; border-bottom: 1px solid var(--border); }
+    .sidebar-logo .name { font-family: var(--font-head); font-size: 1.1rem; font-weight: 800; }
+    .sidebar-logo .name span { color: var(--orange); }
+    .sidebar-logo .role { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+    .nav-items { flex: 1; padding: 12px 10px; overflow-y: auto; }
+    .nav-section { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; padding: 12px 10px 6px; font-weight: 600; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px;
+      cursor: pointer; font-size: 0.9rem; color: var(--muted); transition: all .15s; margin-bottom: 2px;
+    }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: rgba(26,86,219,0.15); color: var(--blue); font-weight: 600; }
+    .nav-item .icon { width: 20px; text-align: center; font-size: 1rem; }
+    .sidebar-footer { padding: 16px 10px; border-top: 1px solid var(--border); }
+    .main { margin-left: 240px; padding: 32px; min-height: 100vh; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-family: var(--font-head); font-size: 1.8rem; font-weight: 800; }
+    .page-header p { color: var(--muted); margin-top: 4px; font-size: 0.9rem; }
+
+    /* ── CARDS & PANELS ── */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+    .panel-title { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+    /* ── STATS ROW ── */
+    .stat-card { background: var(--surface2); border-radius: 10px; padding: 20px; text-align: center; border: 1px solid var(--border); }
+    .stat-num { font-family: var(--font-head); font-size: 2.2rem; font-weight: 800; color: var(--blue); }
+    .stat-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 20px; font-size: 0.9rem;
+      display: none; align-items: center; gap: 10px; max-width: 340px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #toast.show { display: flex; animation: slideIn .3s ease; }
+    #toast.success { border-color: rgba(34,197,94,0.4); }
+    #toast.error   { border-color: rgba(239,68,68,0.4); }
+    @keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── SPINNER ── */
+    .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.2); border-top-color:white; border-radius:50%; animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── BADGE / TAG ── */
+    .badge { display:inline-block; padding:3px 10px; border-radius:50px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+    .badge-blue { background:rgba(26,86,219,0.2); color:#60a5fa; }
+    .badge-orange { background:rgba(249,115,22,0.2); color:#fb923c; }
+    .badge-green { background:rgba(34,197,94,0.2); color:#4ade80; }
+    .badge-gray { background:rgba(255,255,255,0.08); color:var(--muted); }
+
+    /* ── BLOG CARD LIST ── */
+    .blog-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 16px; border-radius: 10px; background: var(--surface2);
+      border: 1px solid var(--border); margin-bottom: 12px;
+    }
+    .blog-thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; background: var(--surface); flex-shrink: 0; display:flex;align-items:center;justify-content:center;font-size:1.8rem; }
+    .blog-thumb img { width:100%;height:100%;object-fit:cover;border-radius:8px; }
+    .blog-meta { flex:1; }
+    .blog-meta h4 { font-weight: 600; margin-bottom: 4px; }
+    .blog-meta p { color: var(--muted); font-size: 0.83rem; line-height: 1.5; }
+    .blog-actions { display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; }
+
+    /* ── QUOTE / EVENT / STAT ITEMS ── */
+    .list-item {
+      padding: 14px 16px; background: var(--surface2); border-radius: 10px;
+      border: 1px solid var(--border); margin-bottom: 10px; display:flex; gap:12px; align-items:flex-start;
+    }
+    .list-item .content { flex:1; }
+    .list-item .content strong { display:block; margin-bottom:3px; }
+    .list-item .content small { color: var(--muted); font-size:0.82rem; }
+    .list-item .actions { display:flex; gap:6px; flex-shrink:0; }
+
+    /* ── IMAGE UPLOAD DROP ZONE ── */
+    .drop-zone {
+      border: 2px dashed var(--border); border-radius: var(--radius);
+      padding: 32px; text-align: center; cursor: pointer; transition: all .2s;
+    }
+    .drop-zone:hover, .drop-zone.over { border-color: var(--blue); background: rgba(26,86,219,0.05); }
+    .drop-zone .dz-icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .drop-zone p { color: var(--muted); font-size: 0.9rem; }
+    .drop-zone input[type=file] { display:none; }
+
+    /* ── IMAGE GRID ── */
+    .img-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(110px,1fr)); gap:10px; margin-top:16px; }
+    .img-thumb { position:relative; border-radius:8px; overflow:hidden; aspect-ratio:1; background:var(--surface); }
+    .img-thumb img { width:100%;height:100%;object-fit:cover; }
+    .img-thumb .img-del { position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.7);border:none;color:white;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:0.75rem; }
+    .img-thumb .img-caption { font-size:0.7rem;color:var(--muted);padding:4px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+
+    /* ── TOGGLE ── */
+    .toggle { position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0; }
+    .toggle input { display:none; }
+    .toggle-slider { position:absolute;inset:0;background:var(--surface2);border-radius:50px;cursor:pointer;border:1px solid var(--border);transition:.2s; }
+    .toggle-slider::after { content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--muted);transition:.2s; }
+    .toggle input:checked + .toggle-slider { background:rgba(26,86,219,0.3);border-color:var(--blue); }
+    .toggle input:checked + .toggle-slider::after { transform:translateX(18px);background:var(--blue); }
+
+    /* ── SETUP WIZARD ── */
+    .setup-step { background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);border-radius:var(--radius);padding:20px;margin-bottom:16px; }
+    .setup-step h3 { font-family:var(--font-head);font-size:1rem;font-weight:700;color:var(--orange);margin-bottom:10px; }
+    .setup-step ol { padding-left:20px;color:var(--muted);font-size:0.88rem;line-height:1.8; }
+    .setup-step code { background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--text);font-size:0.85rem; }
+
+    /* ── TABS ── */
+    .tabs { display:flex;gap:4px;margin-bottom:20px;background:var(--surface2);padding:4px;border-radius:10px;width:fit-content; }
+    .tab { padding:7px 18px;border-radius:7px;cursor:pointer;font-size:0.88rem;font-weight:500;color:var(--muted);transition:.15s; }
+    .tab.active { background:var(--surface);color:var(--text);font-weight:600; }
+
+    /* ── SEPARATOR ── */
+    .sep { border:none;border-top:1px solid var(--border);margin:20px 0; }
+
+    /* ── STATUS DOT ── */
+    .dot { width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px; }
+    .dot-green { background:var(--green); }
+    .dot-gray  { background:var(--muted); }
+
+    /* ── ALERT ── */
+    .alert { padding:12px 16px;border-radius:8px;font-size:0.88rem;margin-bottom:16px;line-height:1.5; }
+    .alert-info { background:rgba(26,86,219,0.1);border:1px solid rgba(26,86,219,0.3);color:#93c5fd; }
+    .alert-warn { background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);color:#fde68a; }
+
+    @media(max-width:768px){
+      .sidebar{transform:translateX(-100%);transition:.3s;}
+      .sidebar.open{transform:none;}
+      .main{margin-left:0;padding:20px;}
+      .grid-2,.grid-3{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ═══════════════════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">YONA<span>Admin</span></div>
+    <div class="login-sub">Content Management System</div>
+    <h2>Sign In</h2>
+    <div class="field">
+      <label>Admin Password</label>
+      <input type="password" id="loginPwd" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">Enter Admin Panel →</button>
+    <p style="margin-top:16px;font-size:0.78rem;color:var(--muted);">
+      Default password: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">yona2026admin</code><br>
+      Change it in Settings after first login.
+    </p>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ════════════════════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="name">YONA<span>Admin</span></div>
+      <div class="role">Content Manager</div>
+    </div>
+    <div class="nav-items">
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" onclick="showPage('dashboard')">
+        <span class="icon">📊</span> Dashboard
+      </div>
+      <div class="nav-section">Site Content</div>
+      <div class="nav-item" onclick="showPage('hero')">
+        <span class="icon">🏠</span> Hero & Tagline
+      </div>
+      <div class="nav-item" onclick="showPage('stats')">
+        <span class="icon">📈</span> Stats & Numbers
+      </div>
+      <div class="nav-item" onclick="showPage('quotes')">
+        <span class="icon">💬</span> Quotes & Testimonials
+      </div>
+      <div class="nav-item" onclick="showPage('events')">
+        <span class="icon">📅</span> Events
+      </div>
+      <div class="nav-section">Blog</div>
+      <div class="nav-item" onclick="showPage('blog')">
+        <span class="icon">📝</span> All Posts
+      </div>
+      <div class="nav-item" onclick="showPage('newpost')">
+        <span class="icon">➕</span> New Post
+      </div>
+      <div class="nav-section">System</div>
+      <div class="nav-item" onclick="showPage('settings')">
+        <span class="icon">⚙️</span> Settings & Setup
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-full btn-sm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Overview of your site content</p>
+      </div>
+      <div id="dashboardStatus" class="alert alert-info" style="display:none"></div>
+      <div class="grid-3" id="dashStats" style="margin-bottom:20px;"></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title">🔄 Recent Changes</div>
+          <div id="recentChanges" style="color:var(--muted);font-size:0.88rem;">Loading...</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">🚀 Quick Actions</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <button class="btn btn-primary" onclick="showPage('newpost')">📝 Write New Blog Post</button>
+            <button class="btn btn-ghost" onclick="showPage('hero')">✏️ Edit Hero Text</button>
+            <button class="btn btn-ghost" onclick="showPage('quotes')">💬 Add Testimonial</button>
+            <button class="btn btn-orange" onclick="publishSite()">🚀 Save & Publish All Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HERO & TAGLINE ── -->
+    <div id="page-hero" class="page">
+      <div class="page-header">
+        <h1>Hero & Tagline</h1>
+        <p>Edit the main headline and call-to-action on the homepage</p>
+      </div>
+      <div class="panel">
+        <div class="panel-title">🏠 Homepage Hero Section</div>
+        <div class="field"><label>Eyebrow Text (small badge)</label><input id="heroEyebrow" placeholder="e.g. You Are Not Alone"/></div>
+        <div class="field"><label>Main Title</label><input id="heroTitle" placeholder="e.g. Together We Feed & Uplift Communities"/></div>
+        <div class="field"><label>Italic/Highlighted Part of Title</label><input id="heroTitleEm" placeholder="e.g. Feed & Uplift (must appear in title above)"/></div>
+        <div class="field"><label>Description</label><textarea id="heroDesc"></textarea></div>
+        <hr class="sep"/>
+        <div class="grid-2">
+          <div class="field"><label>Primary Button Text</label><input id="heroCtaPrimary" placeholder="Donate Now"/></div>
+          <div class="field"><label>Secondary Button Text</label><input id="heroCtaSecondary" placeholder="Get Help"/></div>
+        </div>
+        <div class="field"><label>Mission Quote Strip</label><textarea id="heroMission" style="min-height:70px;"></textarea></div>
+        <button class="btn btn-primary" onclick="saveHero()">💾 Save Hero Content</button>
+      </div>
+    </div>
+
+    <!-- ── STATS ── -->
+    <div id="page-stats" class="page">
+      <div class="page-header">
+        <h1>Stats & Numbers</h1>
+        <p>The 3 impact numbers shown on the homepage hero</p>
+      </div>
+      <div class="panel">
+        <div class="panel-title">📈 Impact Statistics</div>
+        <div id="statsEditor"></div>
+        <button class="btn btn-primary" style="margin-top:12px;" onclick="saveStats()">💾 Save Stats</button>
+      </div>
+    </div>
+
+    <!-- ── QUOTES ── -->
+    <div id="page-quotes" class="page">
+      <div class="page-header">
+        <h1>Quotes & Testimonials</h1>
+        <p>Manage testimonials shown on the homepage and about page</p>
+      </div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-title">➕ Add New Quote</div>
+        <div class="field"><label>Quote Text</label><textarea id="newQuoteText" placeholder="Enter the testimonial..."></textarea></div>
+        <div class="grid-2">
+          <div class="field"><label>Author / Name</label><input id="newQuoteAuthor" placeholder="e.g. Community Member, Guntur"/></div>
+          <div class="field" style="display:flex;align-items:flex-end;gap:10px;">
+            <button class="btn btn-orange" onclick="addQuote()">Add Quote</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">💬 All Testimonials</div>
+        <div id="quotesList"></div>
+      </div>
+    </div>
+
+    <!-- ── EVENTS ── -->
+    <div id="page-events" class="page">
+      <div class="page-header">
+        <h1>Events & Announcements</h1>
+        <p>Manage upcoming events and announcements shown on the site</p>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="evTab('events',this)">Events</div>
+        <div class="tab" onclick="evTab('announcements',this)">Announcements</div>
+      </div>
+
+      <div id="eventsTab">
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-title">➕ Add Event</div>
+          <div class="grid-2">
+            <div class="field"><label>Event Title</label><input id="evTitle" placeholder="e.g. Community Food Drive"/></div>
+            <div class="field"><label>Badge Label</label><input id="evBadge" placeholder="e.g. Monthly, Coming Soon"/></div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label>Date (or "Date TBA")</label><input id="evDate" placeholder="e.g. June 15, 2026 or Date TBA"/></div>
+            <div class="field"><label>Location</label><input id="evLocation" placeholder="e.g. Magdhub Nagar, Guntur"/></div>
+          </div>
+          <div class="field"><label>Description</label><textarea id="evDesc" style="min-height:80px;"></textarea></div>
+          <div class="field"><label>Link (page or mailto)</label><input id="evLink" placeholder="donate.html or contact.html"/></div>
+          <button class="btn btn-orange" onclick="addEvent()">Add Event</button>
+        </div>
+        <div class="panel">
+          <div class="panel-title">📅 All Events</div>
+          <div id="eventsList"></div>
+        </div>
+      </div>
+
+      <div id="announcementsTab" style="display:none;">
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-title">➕ Add Announcement</div>
+          <div class="grid-2">
+            <div class="field"><label>Title</label><input id="annTitle" placeholder="Announcement title"/></div>
+            <div class="field"><label>Date</label><input id="annDate" type="date"/></div>
+          </div>
+          <div class="field"><label>Body</label><textarea id="annBody" style="min-height:80px;"></textarea></div>
+          <button class="btn btn-orange" onclick="addAnnouncement()">Add Announcement</button>
+        </div>
+        <div class="panel">
+          <div class="panel-title">📢 All Announcements</div>
+          <div id="announcementsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BLOG POSTS ── -->
+    <div id="page-blog" class="page">
+      <div class="page-header">
+        <h1>Blog Posts</h1>
+        <p>Manage all published and draft posts</p>
+      </div>
+      <div class="panel">
+        <div id="blogList"><div style="color:var(--muted)">Loading posts...</div></div>
+      </div>
+    </div>
+
+    <!-- ── NEW / EDIT POST ── -->
+    <div id="page-newpost" class="page">
+      <div class="page-header">
+        <h1 id="postPageTitle">New Blog Post</h1>
+        <p>Write content, upload images, and publish</p>
+      </div>
+      <input type="hidden" id="editPostId"/>
+
+      <div class="grid-2" style="align-items:start;">
+        <!-- Left column -->
+        <div>
+          <div class="panel">
+            <div class="panel-title">📝 Post Content</div>
+            <div class="field"><label>Title</label><input id="postTitle" placeholder="Post title..."/></div>
+            <div class="field"><label>Tag / Category</label>
+              <select id="postTag">
+                <option>Food Program</option><option>Volunteers</option><option>Impact</option>
+                <option>Youth</option><option>Social Services</option><option>News</option><option>Announcement</option>
+              </select>
+            </div>
+            <div class="field"><label>Summary (shown in card)</label><textarea id="postSummary" style="min-height:80px;"></textarea></div>
+            <div class="field"><label>Full Body / Article</label><textarea id="postBody" style="min-height:200px;" placeholder="Write the full article here..."></textarea></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">📁 Image Folder Name</div>
+            <div class="alert alert-info">Images will be uploaded to a Google Drive folder with this name. Use something descriptive like <code>food-drive-june-2026</code>.</div>
+            <div class="field"><label>Folder Name (no spaces, use hyphens)</label><input id="postFolder" placeholder="e.g. food-drive-june-2026"/></div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div>
+          <div class="panel">
+            <div class="panel-title">🖼️ Post Images</div>
+            <div id="driveAuthRequired" style="display:none;" class="alert alert-warn">
+              ⚠️ Connect Google Drive in Settings to upload images.
+            </div>
+            <div id="imageUploadArea">
+              <div class="drop-zone" id="dropZone" onclick="document.getElementById('imageInput').click()">
+                <div class="dz-icon">☁️</div>
+                <p><strong>Click to upload</strong> or drag & drop images</p>
+                <p style="font-size:0.78rem;margin-top:4px;">PNG, JPG, WEBP — multiple allowed</p>
+                <input type="file" id="imageInput" multiple accept="image/*" onchange="handleImageSelect(event)"/>
+              </div>
+              <div id="uploadProgress" style="display:none;margin-top:12px;">
+                <div style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:0.88rem;">
+                  <div class="spinner"></div> Uploading images to Google Drive...
+                </div>
+              </div>
+              <div id="imgGrid" class="img-grid"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">⚙️ Publish Settings</div>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <div><strong>Visible on Site</strong><br><small style="color:var(--muted)">Toggle off to save as draft</small></div>
+                <label class="toggle"><input type="checkbox" id="postVisible" checked/><span class="toggle-slider"></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <div><strong>Featured Post</strong><br><small style="color:var(--muted)">Shown first / highlighted</small></div>
+                <label class="toggle"><input type="checkbox" id="postFeatured"/><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+            <hr class="sep"/>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="savePost()">💾 Save Post</button>
+              <button class="btn btn-orange" onclick="savePost(true)">🚀 Save & Publish</button>
+              <button class="btn btn-ghost" onclick="cancelEdit()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div id="page-settings" class="page">
+      <div class="page-header">
+        <h1>Settings & Setup</h1>
+        <p>Configure Google Drive integration and admin password</p>
+      </div>
+
+      <!-- Setup Guide -->
+      <div class="panel">
+        <div class="panel-title">🚀 First-Time Google Drive Setup</div>
+        <div class="setup-step">
+          <h3>Step 1 — Create Google Cloud Project</h3>
+          <ol>
+            <li>Go to <strong>console.cloud.google.com</strong> → New Project → Name it <code>YONA CMS</code></li>
+            <li>Enable <strong>Google Drive API</strong> → APIs & Services → Enable APIs</li>
+            <li>Create <strong>API Key</strong> → Credentials → Create API Key → Copy it below</li>
+            <li>Restrict API key to <code>Google Drive API</code> only (recommended)</li>
+          </ol>
+        </div>
+        <div class="setup-step">
+          <h3>Step 2 — Create OAuth Client (for uploads)</h3>
+          <ol>
+            <li>Go to Credentials → Create OAuth 2.0 Client ID → Web Application</li>
+            <li>Under Authorised JavaScript origins, add your site URL (or <code>http://localhost</code> for local testing)</li>
+            <li>Copy the <strong>Client ID</strong> and paste below</li>
+          </ol>
+        </div>
+        <div class="setup-step">
+          <h3>Step 3 — Initial Drive Setup</h3>
+          <ol>
+            <li>Enter your API Key and Client ID below, then click <strong>"Connect Google Drive"</strong></li>
+            <li>Sign in with your Gmail account (supportyona@gmail.com)</li>
+            <li>Click <strong>"Create Content File"</strong> — this creates <code>yona-content.json</code> in your Drive</li>
+            <li>Your site will now read and write from that file!</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- API Config -->
+      <div class="panel">
+        <div class="panel-title">🔑 Google API Configuration</div>
+        <div class="grid-2">
+          <div class="field"><label>API Key (for public reads)</label><input id="cfgApiKey" placeholder="AIza..."/></div>
+          <div class="field"><label>OAuth Client ID</label><input id="cfgClientId" placeholder="xxx.apps.googleusercontent.com"/></div>
+        </div>
+        <div class="field"><label>Content File ID (auto-filled after setup)</label><input id="cfgFileId" placeholder="Will be filled automatically"/></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+          <button class="btn btn-primary" onclick="saveApiConfig()">💾 Save Config</button>
+          <button class="btn btn-orange" id="btnGoogleAuth" onclick="doGoogleAuth()">🔗 Connect Google Drive</button>
+          <button class="btn btn-ghost" id="btnCreateFile" onclick="createContentFile()" style="display:none;">📄 Create Content File</button>
+        </div>
+        <div id="authStatus" style="margin-top:12px;font-size:0.85rem;color:var(--muted);"></div>
+      </div>
+
+      <!-- Password -->
+      <div class="panel">
+        <div class="panel-title">🔒 Change Admin Password</div>
+        <div class="alert alert-warn">Password is stored in your browser. Use the same browser/device to access admin.</div>
+        <div class="grid-2">
+          <div class="field"><label>New Password</label><input type="password" id="newPwd" placeholder="New password"/></div>
+          <div class="field"><label>Confirm Password</label><input type="password" id="confirmPwd" placeholder="Confirm password"/></div>
+        </div>
+        <button class="btn btn-primary" onclick="changePwd()">🔒 Update Password</button>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="panel" style="border-color:rgba(239,68,68,0.3);">
+        <div class="panel-title" style="color:var(--red);">⚠️ Reload Content from Drive</div>
+        <p style="color:var(--muted);font-size:0.88rem;margin-bottom:14px;">Discard local changes and reload content from Google Drive.</p>
+        <button class="btn btn-danger" onclick="reloadContent()">🔄 Reload from Drive</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════════════════
+let content = null;  // loaded from Drive or defaults
+let dirty = false;   // unsaved changes
+
+// ════════════════════════════════════════════════════════════════════════════
+// AUTH / LOGIN
+// ════════════════════════════════════════════════════════════════════════════
+function getAdminPwd() { return localStorage.getItem('yona_admin_pwd') || 'yona2026admin'; }
+
+function doLogin() {
+  const pwd = document.getElementById('loginPwd').value;
+  if (pwd === getAdminPwd()) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    toast('Incorrect password', 'error');
+    document.getElementById('loginPwd').value = '';
+  }
+}
+document.getElementById('loginPwd').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogout() {
+  if (dirty && !confirm('You have unsaved changes. Leave anyway?')) return;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+function changePwd() {
+  const p1 = document.getElementById('newPwd').value;
+  const p2 = document.getElementById('confirmPwd').value;
+  if (!p1) return toast('Enter a new password', 'error');
+  if (p1 !== p2) return toast('Passwords do not match', 'error');
+  localStorage.setItem('yona_admin_pwd', p1);
+  document.getElementById('newPwd').value = '';
+  document.getElementById('confirmPwd').value = '';
+  toast('Password updated!', 'success');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════════════
+async function initApp() {
+  fillSettingsFields();
+  content = await YONA_DRIVE.loadContent();
+  renderDashboard();
+  renderHero();
+  renderStats();
+  renderQuotes();
+  renderEvents();
+  renderBlogList();
+  setupDragDrop();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.trim().toLowerCase().includes(id === 'newpost' ? 'new' : id.slice(0,4))) n.classList.add('active');
+  });
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════════════════════
+function renderDashboard() {
+  if (!content) return;
+  const fileId = YONA_DRIVE.getContentFileId();
+  const status = document.getElementById('dashboardStatus');
+  if (!fileId) {
+    status.style.display = 'block';
+    status.textContent = '⚙️ Google Drive not configured. Go to Settings to set up Drive integration. Until then, changes are saved locally only.';
+  }
+  const posts = content.blog_posts || [];
+  const html = `
+    <div class="stat-card"><div class="stat-num">${posts.filter(p=>p.visible).length}</div><div class="stat-label">Published Posts</div></div>
+    <div class="stat-card"><div class="stat-num">${posts.filter(p=>!p.visible).length}</div><div class="stat-label">Drafts</div></div>
+    <div class="stat-card"><div class="stat-num">${(content.quotes||[]).length}</div><div class="stat-label">Testimonials</div></div>
+  `;
+  document.getElementById('dashStats').innerHTML = html;
+  document.getElementById('recentChanges').innerHTML =
+    content._updated ? `<p>Last saved: <strong>${new Date(content._updated).toLocaleString()}</strong></p>` : '<p>Not yet saved to Drive</p>';
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// HERO
+// ════════════════════════════════════════════════════════════════════════════
+function renderHero() {
+  const h = content.hero || {};
+  document.getElementById('heroEyebrow').value = h.eyebrow || '';
+  document.getElementById('heroTitle').value = h.title || '';
+  document.getElementById('heroTitleEm').value = h.titleEm || '';
+  document.getElementById('heroDesc').value = h.description || '';
+  document.getElementById('heroCtaPrimary').value = h.ctaPrimary || '';
+  document.getElementById('heroCtaSecondary').value = h.ctaSecondary || '';
+  document.getElementById('heroMission').value = content.mission_quote || '';
+}
+
+function saveHero() {
+  content.hero = {
+    eyebrow: v('heroEyebrow'), title: v('heroTitle'),
+    titleEm: v('heroTitleEm'), description: v('heroDesc'),
+    ctaPrimary: v('heroCtaPrimary'), ctaSecondary: v('heroCtaSecondary'),
+  };
+  content.mission_quote = v('heroMission');
+  markDirty(); save();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// STATS
+// ════════════════════════════════════════════════════════════════════════════
+function renderStats() {
+  const stats = content.stats || [{num:'100+',label:'Meals Served'},{num:'10+',label:'Families Helped'},{num:'25+',label:'Volunteers'}];
+  let html = '';
+  stats.forEach((s, i) => {
+    html += `<div class="list-item">
+      <div class="content" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="field" style="margin:0;"><label>Number / Value</label><input value="${s.num}" id="stat_num_${i}" placeholder="e.g. 100+"/></div>
+        <div class="field" style="margin:0;"><label>Label</label><input value="${s.label}" id="stat_lab_${i}" placeholder="e.g. Meals Served"/></div>
+      </div>
+      <div class="actions"><button class="btn btn-danger btn-sm" onclick="removeStat(${i})">✕</button></div>
+    </div>`;
+  });
+  html += `<button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="addStat()">+ Add Stat</button>`;
+  document.getElementById('statsEditor').innerHTML = html;
+}
+
+function addStat() { content.stats = collectStats(); content.stats.push({num:'0+',label:'New Stat'}); renderStats(); markDirty(); }
+function removeStat(i) { content.stats = collectStats(); content.stats.splice(i,1); renderStats(); markDirty(); }
+function collectStats() {
+  const n = document.querySelectorAll('[id^=stat_num_]').length;
+  return Array.from({length:n}, (_,i) => ({num: v('stat_num_'+i), label: v('stat_lab_'+i)}));
+}
+function saveStats() { content.stats = collectStats(); markDirty(); save(); }
+
+// ════════════════════════════════════════════════════════════════════════════
+// QUOTES
+// ════════════════════════════════════════════════════════════════════════════
+function renderQuotes() {
+  const quotes = content.quotes || [];
+  let html = quotes.length ? '' : '<p style="color:var(--muted)">No testimonials yet.</p>';
+  quotes.forEach((q, i) => {
+    html += `<div class="list-item">
+      <div class="dot ${q.visible ? 'dot-green' : 'dot-gray'}"></div>
+      <div class="content">
+        <strong>"${q.text.slice(0,80)}${q.text.length>80?'…':''}"</strong>
+        <small>— ${q.author}</small>
+      </div>
+      <div class="actions">
+        <label class="toggle" title="${q.visible?'Hide':'Show'}"><input type="checkbox" ${q.visible?'checked':''} onchange="toggleQuote(${i},this.checked)"/><span class="toggle-slider"></span></label>
+        <button class="btn btn-danger btn-sm" onclick="deleteQuote(${i})">✕</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('quotesList').innerHTML = html;
+}
+
+function addQuote() {
+  const text = v('newQuoteText'), author = v('newQuoteAuthor');
+  if (!text) return toast('Enter quote text', 'error');
+  if (!content.quotes) content.quotes = [];
+  content.quotes.push({ text, author: author || 'Community Member', visible: true });
+  document.getElementById('newQuoteText').value = '';
+  document.getElementById('newQuoteAuthor').value = '';
+  renderQuotes(); markDirty(); save();
+}
+function toggleQuote(i, val) { content.quotes[i].visible = val; markDirty(); save(); }
+function deleteQuote(i) { if(!confirm('Delete this quote?')) return; content.quotes.splice(i,1); renderQuotes(); markDirty(); save(); }
+
+// ════════════════════════════════════════════════════════════════════════════
+// EVENTS & ANNOUNCEMENTS
+// ════════════════════════════════════════════════════════════════════════════
+function evTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('eventsTab').style.display = tab === 'events' ? '' : 'none';
+  document.getElementById('announcementsTab').style.display = tab === 'announcements' ? '' : 'none';
+  if (tab === 'events') renderEvents(); else renderAnnouncements();
+}
+
+function renderEvents() {
+  const events = content.events || [];
+  let html = events.length ? '' : '<p style="color:var(--muted)">No events yet.</p>';
+  events.forEach((e,i) => {
+    html += `<div class="list-item">
+      <div class="dot ${e.visible ? 'dot-green' : 'dot-gray'}"></div>
+      <div class="content">
+        <strong>${e.title}</strong> <span class="badge badge-blue">${e.badge}</span>
+        <small>${e.date} · ${e.location}</small>
+      </div>
+      <div class="actions">
+        <label class="toggle"><input type="checkbox" ${e.visible?'checked':''} onchange="toggleEvent(${i},this.checked)"/><span class="toggle-slider"></span></label>
+        <button class="btn btn-danger btn-sm" onclick="deleteEvent(${i})">✕</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('eventsList').innerHTML = html;
+}
+
+function addEvent() {
+  const title = v('evTitle');
+  if (!title) return toast('Enter event title','error');
+  if (!content.events) content.events = [];
+  content.events.push({ title, badge: v('evBadge')||'Upcoming', date: v('evDate')||'TBA', location: v('evLocation'), description: v('evDesc'), link: v('evLink')||'contact.html', visible: true });
+  ['evTitle','evBadge','evDate','evLocation','evDesc','evLink'].forEach(id => document.getElementById(id).value='');
+  renderEvents(); markDirty(); save();
+}
+function toggleEvent(i,val){content.events[i].visible=val;markDirty();save();}
+function deleteEvent(i){if(!confirm('Delete event?'))return;content.events.splice(i,1);renderEvents();markDirty();save();}
+
+function renderAnnouncements() {
+  const anns = content.announcements || [];
+  let html = anns.length ? '' : '<p style="color:var(--muted)">No announcements yet.</p>';
+  anns.forEach((a,i) => {
+    html += `<div class="list-item">
+      <div class="dot ${a.visible ? 'dot-green' : 'dot-gray'}"></div>
+      <div class="content">
+        <strong>${a.title}</strong>
+        <small>${a.date} · ${a.body.slice(0,80)}${a.body.length>80?'…':''}</small>
+      </div>
+      <div class="actions">
+        <label class="toggle"><input type="checkbox" ${a.visible?'checked':''} onchange="toggleAnn(${i},this.checked)"/><span class="toggle-slider"></span></label>
+        <button class="btn btn-danger btn-sm" onclick="deleteAnn(${i})">✕</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('announcementsList').innerHTML = html;
+}
+function addAnnouncement() {
+  const title = v('annTitle');
+  if (!title) return toast('Enter title','error');
+  if (!content.announcements) content.announcements = [];
+  content.announcements.push({ title, body: v('annBody'), date: v('annDate') || new Date().toISOString().split('T')[0], visible: true });
+  ['annTitle','annBody','annDate'].forEach(id => document.getElementById(id).value='');
+  renderAnnouncements(); markDirty(); save();
+}
+function toggleAnn(i,val){content.announcements[i].visible=val;markDirty();save();}
+function deleteAnn(i){if(!confirm('Delete?'))return;content.announcements.splice(i,1);renderAnnouncements();markDirty();save();}
+
+// ════════════════════════════════════════════════════════════════════════════
+// BLOG POSTS
+// ════════════════════════════════════════════════════════════════════════════
+function renderBlogList() {
+  const posts = content.blog_posts || [];
+  if (!posts.length) {
+    document.getElementById('blogList').innerHTML = '<p style="color:var(--muted)">No posts yet. <a onclick="showPage(\'newpost\')" style="color:var(--blue);cursor:pointer;">Write your first post →</a></p>';
+    return;
+  }
+  let html = '';
+  posts.slice().reverse().forEach((post) => {
+    const thumb = post.images && post.images[0]
+      ? `<img src="${YONA_DRIVE.driveImageUrl(post.images[0].driveFileId)}" onerror="this.parentNode.textContent='📝'"/>`
+      : '📝';
+    html += `<div class="blog-item">
+      <div class="blog-thumb">${thumb}</div>
+      <div class="blog-meta">
+        <h4>${post.title || 'Untitled'}</h4>
+        <p>${post.summary ? post.summary.slice(0,100)+'…' : ''}</p>
+        <div style="margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <span class="badge badge-blue">${post.tag||''}</span>
+          ${post.visible ? '<span class="badge badge-green">Published</span>' : '<span class="badge badge-gray">Draft</span>'}
+          ${post.featured ? '<span class="badge badge-orange">Featured</span>' : ''}
+          <span style="color:var(--muted);font-size:0.78rem;">${post.date||''}</span>
+        </div>
+      </div>
+      <div class="blog-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editPost('${post.id}')">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deletePost('${post.id}')">🗑️</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('blogList').innerHTML = html;
+}
+
+// current images being managed in editor
+let currentImages = []; // [{driveFileId, name, caption, local?}]
+let editingPostId = null;
+
+function editPost(id) {
+  const post = content.blog_posts.find(p => p.id === id);
+  if (!post) return;
+  editingPostId = id;
+  document.getElementById('postPageTitle').textContent = 'Edit Post';
+  document.getElementById('editPostId').value = id;
+  document.getElementById('postTitle').value = post.title || '';
+  document.getElementById('postTag').value = post.tag || 'Food Program';
+  document.getElementById('postSummary').value = post.summary || '';
+  document.getElementById('postBody').value = post.body || '';
+  document.getElementById('postFolder').value = post.folderName || '';
+  document.getElementById('postVisible').checked = !!post.visible;
+  document.getElementById('postFeatured').checked = !!post.featured;
+  currentImages = [...(post.images || [])];
+  renderImgGrid();
+  showPage('newpost');
+}
+
+function cancelEdit() {
+  editingPostId = null;
+  currentImages = [];
+  document.getElementById('editPostId').value = '';
+  document.getElementById('postPageTitle').textContent = 'New Blog Post';
+  ['postTitle','postSummary','postBody','postFolder'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('postVisible').checked = true;
+  document.getElementById('postFeatured').checked = false;
+  renderImgGrid();
+  showPage('blog');
+}
+
+async function savePost(publish) {
+  const title = v('postTitle');
+  if (!title) return toast('Enter a title', 'error');
+
+  const id = editingPostId || 'post_' + Date.now();
+  const folderName = v('postFolder') || title.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').slice(0,40);
+
+  const post = {
+    id, title, folderName,
+    tag: v('postTag'), summary: v('postSummary'), body: v('postBody'),
+    images: [...currentImages],
+    date: new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}),
+    visible: publish ? true : document.getElementById('postVisible').checked,
+    featured: document.getElementById('postFeatured').checked,
+  };
+
+  if (!content.blog_posts) content.blog_posts = [];
+  const idx = content.blog_posts.findIndex(p => p.id === id);
+  if (idx >= 0) content.blog_posts[idx] = post;
+  else content.blog_posts.push(post);
+
+  markDirty();
+  await save();
+  renderBlogList();
+  cancelEdit();
+  toast(publish ? '🚀 Post published!' : '💾 Post saved!', 'success');
+}
+
+function deletePost(id) {
+  if (!confirm('Delete this post permanently?')) return;
+  content.blog_posts = content.blog_posts.filter(p => p.id !== id);
+  renderBlogList(); markDirty(); save();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// IMAGE UPLOAD
+// ════════════════════════════════════════════════════════════════════════════
+function setupDragDrop() {
+  const dz = document.getElementById('dropZone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); handleFiles(Array.from(e.dataTransfer.files)); });
+}
+
+function handleImageSelect(e) { handleFiles(Array.from(e.target.files)); e.target.value = ''; }
+
+async function handleFiles(files) {
+  const imgFiles = files.filter(f => f.type.startsWith('image/'));
+  if (!imgFiles.length) return;
+
+  if (!YONA_DRIVE.getAccessToken()) {
+    // No Drive auth — store as data URLs for now (won't persist to Drive)
+    for (const file of imgFiles) {
+      const dataUrl = await readAsDataURL(file);
+      currentImages.push({ driveFileId: null, dataUrl, name: file.name, caption: '' });
+    }
+    renderImgGrid();
+    toast('Images added (Drive not connected — save to Drive in Settings for persistence)', 'error');
+    return;
+  }
+
+  // Upload to Drive
+  const folderName = v('postFolder') || v('postTitle').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').slice(0,40) || 'yona-images';
+  document.getElementById('uploadProgress').style.display = 'block';
+
+  try {
+    // Get or create folder
+    let folderId = YONA_DRIVE.cfg('blog_root_folder');
+    if (!folderId) {
+      const root = await YONA_DRIVE.createFolder('YONA Blog Images');
+      YONA_DRIVE.setCfg('blog_root_folder', root.id);
+      folderId = root.id;
+    }
+    const postFolder = await YONA_DRIVE.createFolder(folderName, folderId);
+
+    for (const file of imgFiles) {
+      const uploaded = await YONA_DRIVE.uploadImage(file, postFolder.id);
+      currentImages.push({ driveFileId: uploaded.id, name: uploaded.name, caption: '' });
+    }
+    toast(`✅ ${imgFiles.length} image(s) uploaded!`, 'success');
+  } catch(e) {
+    toast('Upload failed: ' + e.message, 'error');
+  } finally {
+    document.getElementById('uploadProgress').style.display = 'none';
+  }
+  renderImgGrid();
+}
+
+function renderImgGrid() {
+  const grid = document.getElementById('imgGrid');
+  if (!currentImages.length) { grid.innerHTML = ''; return; }
+  grid.innerHTML = currentImages.map((img, i) => `
+    <div class="img-thumb">
+      <img src="${img.dataUrl || YONA_DRIVE.driveImageUrl(img.driveFileId)}" alt="${img.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2224%22>🖼️</text></svg>'"/>
+      <button class="img-del" onclick="removeImg(${i})">✕</button>
+      <div class="img-caption">${img.name}</div>
+    </div>`).join('');
+}
+
+function removeImg(i) { currentImages.splice(i,1); renderImgGrid(); }
+function readAsDataURL(file) { return new Promise(r => { const fr = new FileReader(); fr.onload = e => r(e.target.result); fr.readAsDataURL(file); }); }
+
+// ════════════════════════════════════════════════════════════════════════════
+// SETTINGS & GOOGLE AUTH
+// ════════════════════════════════════════════════════════════════════════════
+function fillSettingsFields() {
+  document.getElementById('cfgApiKey').value = YONA_DRIVE.cfg('api_key') || '';
+  document.getElementById('cfgClientId').value = YONA_DRIVE.cfg('client_id') || '';
+  document.getElementById('cfgFileId').value = YONA_DRIVE.cfg('content_file_id') || '';
+}
+
+function saveApiConfig() {
+  YONA_DRIVE.setCfg('api_key', v('cfgApiKey'));
+  YONA_DRIVE.setCfg('client_id', v('cfgClientId'));
+  YONA_DRIVE.setCfg('content_file_id', v('cfgFileId'));
+  toast('API config saved!', 'success');
+}
+
+function doGoogleAuth() {
+  const clientId = v('cfgClientId') || YONA_DRIVE.cfg('client_id');
+  if (!clientId) return toast('Enter Client ID first', 'error');
+  const scope = 'https://www.googleapis.com/auth/drive.file';
+  const redirectUri = encodeURIComponent(window.location.href.split('?')[0]);
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(scope)}&prompt=select_account`;
+  window.location.href = url;
+}
+
+function checkOAuthRedirect() {
+  const hash = window.location.hash;
+  if (!hash.includes('access_token')) return;
+  const params = new URLSearchParams(hash.slice(1));
+  const token = params.get('access_token');
+  if (token) {
+    YONA_DRIVE.setAccessToken(token);
+    window.history.replaceState({}, '', window.location.pathname);
+    document.getElementById('authStatus').textContent = '✅ Connected to Google Drive!';
+    document.getElementById('authStatus').style.color = 'var(--green)';
+    document.getElementById('btnCreateFile').style.display = YONA_DRIVE.cfg('content_file_id') ? 'none' : '';
+    toast('Google Drive connected!', 'success');
+  }
+}
+
+async function createContentFile() {
+  try {
+    const file = await YONA_DRIVE.createContentFile();
+    document.getElementById('cfgFileId').value = file.id;
+    toast('Content file created! ID: ' + file.id, 'success');
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// SAVE / PUBLISH
+// ════════════════════════════════════════════════════════════════════════════
+async function save() {
+  if (!YONA_DRIVE.getAccessToken() || !YONA_DRIVE.getContentFileId()) {
+    // save to localStorage as fallback
+    localStorage.setItem('yona_content_draft', JSON.stringify(content));
+    dirty = false;
+    return;
+  }
+  try {
+    await YONA_DRIVE.saveContent(content);
+    dirty = false;
+    renderDashboard();
+  } catch(e) {
+    toast('Save failed: ' + e.message, 'error');
+  }
+}
+
+async function publishSite() {
+  const btn = event.target;
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Saving...';
+  await save();
+  btn.disabled = false; btn.innerHTML = '🚀 Save & Publish All Changes';
+  toast('✅ All changes saved to Google Drive!', 'success');
+}
+
+async function reloadContent() {
+  if (!confirm('Reload from Drive? Local unsaved changes will be lost.')) return;
+  content = await YONA_DRIVE.loadContent();
+  renderDashboard(); renderHero(); renderStats(); renderQuotes(); renderEvents(); renderBlogList();
+  toast('Content reloaded from Drive', 'success');
+}
+
+function markDirty() { dirty = true; }
+
+// ════════════════════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════════════════════
+function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function toast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = (type==='success'?'✅ ':'❌ ') + msg;
+  t.className = 'show ' + type;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = '', 3500);
+}
+
+window.addEventListener('beforeunload', e => { if(dirty){ e.preventDefault(); e.returnValue=''; } });
+
+// Check OAuth redirect on page load
+checkOAuthRedirect();
+
+// Load draft from localStorage if Drive not configured
+window.addEventListener('load', () => {
+  const draft = localStorage.getItem('yona_content_draft');
+  if (draft && !YONA_DRIVE.getContentFileId()) {
+    try {
+      const parsed = JSON.parse(draft);
+      // will be overridden by initApp, but note it exists
+    } catch(e){}
+  }
+});
+</script>
+</body>
+</html>
